@@ -33,7 +33,7 @@ class Entry(BaseModel):
     money_log = peewee.TextField()
 
     def save(self, *args, **kwargs):
-        self.money_log = u'{entry_date}\t{value}\t\t{account},{tags}|{description}'.format(
+        self.money_log = u'{entry_date}\t{value:.2f}\t\t{account},{tags}|{description}'.format(
             entry_date = self.entry_date,
             value = self.value,
             account = self.account,
