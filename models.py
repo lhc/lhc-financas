@@ -30,6 +30,16 @@ class Entry(BaseModel):
     account = peewee.CharField()
     tags = peewee.CharField()
     description = peewee.TextField()
+    money_log = peewee.TextField()
 
+    def save(self, *args, **kwargs):
+        self.money_log = u'{entry_date}\t{value}\t\t{account},{tags}|{description}'.format(
+            entry_date = self.entry_date,
+            value = self.value,
+            account = self.account,
+            tags = self.tags,
+            description = self.description
+        )
+        return super(Entry, self).save(*args, **kwargs)
 
 db.create_tables([Entry, ], safe=True)
