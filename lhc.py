@@ -1,9 +1,20 @@
 #-*- coding: utf-8 -*-
-from flask import Flask, jsonify, request
+from flask import Flask, g, jsonify, request
 
 import models
 
 app = Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    g.db = models.db
+    g.db.connect()
+
+@app.after_request
+def after_request(response):
+    g.db.close()
+    return response
 
 
 def valid_payment(entry):
