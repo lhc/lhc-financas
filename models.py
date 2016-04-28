@@ -28,7 +28,7 @@ class Entry(BaseModel):
     entry_date = peewee.DateField()
     value = peewee.DecimalField()
     account = peewee.CharField()
-    tags = peewee.CharField
+    tags = peewee.CharField()
     description = peewee.TextField()
 
 
