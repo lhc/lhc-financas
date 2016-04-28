@@ -45,6 +45,17 @@ def payment():
         return jsonify({'status':'Bad Request'}), 400
 
 
+@app.route('/report', methods=['GET', ])
+def report():
+    entries = models.Entry.select()
+    with open('money_template.html', 'r') as template:
+        moneylog_entries = '\n'.join([entry.money_log for entry in entries])
+        template_content = template.read()
+        report_content = template_content.replace(
+            '[CONTEUDO]', moneylog_entries.encode('utf-8'))
+    return report_content
+
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
