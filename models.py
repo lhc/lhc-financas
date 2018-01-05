@@ -1,12 +1,12 @@
 import datetime
-import json
 import peewee
 from playhouse.shortcuts import model_to_dict
+from playhouse.signals import Model, post_save
 
 db = peewee.SqliteDatabase('lhc.db')
 
 
-class BaseModel(peewee.Model):
+class BaseModel(Model):
 
     class Meta:
         database = db
@@ -30,16 +30,33 @@ class Entry(BaseModel):
     account = peewee.CharField()
     tags = peewee.CharField()
     description = peewee.TextField()
-    money_log = peewee.TextField()
 
-    def save(self, *args, **kwargs):
-        self.money_log = u'{entry_date}\t{value:.2f}\t\t{account},{tags}|{description}'.format(
-            entry_date = self.entry_date,
-            value = self.value,
-            account = self.account,
-            tags = self.tags,
-            description = self.description
+
+@post_save(sender=Entry)
+def on_save_entry_handler(model_class, instance, created):
+    entry_year = datetime.datetime.strptime(
+        instance.entry_date, '%Y-%m-%d').year
+    report_file = 'templates/lhc_{}.html'.format(entry_year)
+    with open('lhc_report_template.html', 'r') as template:
+        report_template = template.read()
+
+    with open(report_file, 'w') as report:
+        formatted_entries = []
+        entries = Entry.select().where(Entry.entry_date.year == entry_year)
+
+        for entry in entries:
+            formatted_entry = u'{entry_date}\t{value:.2f}\t\t{account},{tags}|#{id} - {description}'.format(
+                entry_date=entry.entry_date,
+                value=entry.value,
+                account=entry.account,
+                tags=entry.tags,
+                id=entry.id,
+                description=entry.description
+            )
+            formatted_entries.append(formatted_entry)
+
+        report.write(
+            report_template.replace('[[entries]]', '\n'.join(formatted_entries))
         )
-        return super(Entry, self).save(*args, **kwargs)
 
 db.create_tables([Entry, ], safe=True)
