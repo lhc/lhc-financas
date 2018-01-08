@@ -59,4 +59,5 @@ def on_save_entry_handler(model_class, instance, created):
             report_template.replace('[[entries]]', '\n'.join(formatted_entries))
         )
 
-db.create_tables([Entry, ], safe=True)
+if not Entry.table_exists():
+    db.create_tables([Entry, ], safe=True)
