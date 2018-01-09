@@ -9,6 +9,7 @@ import models
 PAYPAL_PRODUCTION = 'https://ipnpb.paypal.com/cgi-bin/webscr'
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 def valid_entry(entry):
