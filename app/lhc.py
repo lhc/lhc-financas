@@ -68,7 +68,9 @@ def paypal_notification():
         verify=True)
     validation_response.raise_for_status()
 
-    if validation_response.text == 'VERIFIED':
+    txn_type = notification.get('txn_type')
+
+    if validation_response.text == 'VERIFIED' and txn_type == 'subscr_payment':
         full_name = ' '.join([
             notification.get('first_name', ''),
             notification.get('last_name', ''),
@@ -89,7 +91,12 @@ def paypal_notification():
             full_name)
         tax_description = 'Taxa - {}'.format(description)
 
-        tags = 'mensalidade' if 'mensalidade' in description.lower() else ''
+        if 'contribui' in description.lower():
+            tags = 'contribuicao'
+        elif 'mensalidade' in description.lower():
+            tags = 'mensalidade'
+        else:
+            tags = ''
 
         entry = models.Entry(
             entry_date=entry_date,
