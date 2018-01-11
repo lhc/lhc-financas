@@ -99,7 +99,7 @@ def paypal_notification():
             'lhc-30': 'contribuicao',
             'doacao-lhc': 'doacao',
         }
-        tags = tags_map.get(notification.get(), 'item_number')
+        tags = tags_map.get(notification.get('item_number', ''), '')
 
         entry = models.Entry(
             entry_date=entry_date,
