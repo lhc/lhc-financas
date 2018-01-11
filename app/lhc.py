@@ -91,12 +91,15 @@ def paypal_notification():
             full_name)
         tax_description = 'Taxa - {}'.format(description)
 
-        if 'contribui' in description.lower():
-            tags = 'contribuicao'
-        elif 'mensalidade' in description.lower():
-            tags = 'mensalidade'
-        else:
-            tags = ''
+        tags_map = {
+            'camiseta-30': 'camiseta',
+            'lhc-85': 'mensalidade',
+            'lhc-110': 'mensalidade',
+            'lhc-60': 'mensalidade',
+            'lhc-30': 'contribuicao',
+            'doacao-lhc': 'doacao',
+        }
+        tags = tags_map.get(notification.get(), 'item_number')
 
         entry = models.Entry(
             entry_date=entry_date,
