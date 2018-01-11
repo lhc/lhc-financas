@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
+import re
+
 import requests
 
 from flask import Flask, jsonify, request, render_template
@@ -66,14 +68,20 @@ def paypal_notification():
         verify=True)
     validation_response.raise_for_status()
 
-    if validation_response == 'VERIFIED':
+    if validation_response.text == 'VERIFIED':
         full_name = ' '.join([
             notification.get('first_name', ''),
             notification.get('last_name', ''),
         ])
         value = notification.get('mc_gross', '0')
         tax_value = '-{}'.format(notification.get('mc_fee', '0'))
-        entry_date = ''
+
+        payment_date = notification.get('payment_date', '')
+        match = re.findall('[A-Za-z]{3} [0-9]{2}, [0-9]{4}', payment_date)
+        if match:
+            raw_payment_date = match.pop()
+            entry_date = datetime.datetime.strptime(raw_payment_date, '%b %d, %Y')
+            entry_date = entry_date.strftime('%Y-%m-%d')
 
         account = '_paypal'
         description = '{} - {}'.format(
