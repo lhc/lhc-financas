@@ -68,9 +68,9 @@ def paypal_notification():
         verify=True)
     validation_response.raise_for_status()
 
+    valid_txn_types = ('subscr_payment', 'web_accept', )
     txn_type = notification.get('txn_type')
-
-    if validation_response.text == 'VERIFIED' and txn_type == 'subscr_payment':
+    if validation_response.text == 'VERIFIED' and txn_type in valid_txn_types:
         full_name = ' '.join([
             notification.get('first_name', ''),
             notification.get('last_name', ''),
@@ -92,7 +92,7 @@ def paypal_notification():
         tax_description = 'Taxa - {}'.format(description)
 
         tags_map = {
-            'camiseta-30': 'camiseta',
+            'camiseta-30': 'camisetas',
             'lhc-85': 'mensalidade',
             'lhc-110': 'mensalidade',
             'lhc-60': 'mensalidade',
