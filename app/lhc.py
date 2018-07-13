@@ -89,9 +89,9 @@ def status():
         sum([entry.value for entry in actual_expenses]))
 
     return jsonify({
-        "actual_incomes": total_incomes,
-        "actual_expenses": total_expenses,
-        "regular_expenses_estimate": regular_expenses_estimate,
+        "actual_incomes": str(total_incomes),
+        "actual_expenses": str(total_expenses),
+        "regular_expenses_estimate": str(regular_expenses_estimate),
     }), 200
 
 
