@@ -67,7 +67,7 @@ def status():
         (models.Entry.tags.in_(['aluguel', 'cpfl', 'net', 'sanasa']))
     )
     regular_expenses_estimate = abs(
-        sum([models.entry.value for entry in regular_expenses_past_month]))
+        sum([entry.value for entry in regular_expenses_past_month]))
 
     actual_incomes = models.Entry.select().where(
         (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
@@ -76,7 +76,7 @@ def status():
         (~models.Entry.tags.in_(['transferencia', ]))
     )
     total_incomes = abs(
-        sum([models.entry.value for entry in actual_incomes]))
+        sum([entry.value for entry in actual_incomes]))
 
     actual_expenses = models.Entry.select().where(
         (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
