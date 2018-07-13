@@ -51,6 +51,50 @@ def report(year=None):
     return render_template(report_file)
 
 
+@app.route('/status')
+def status():
+    month = datetime.date.today().month
+    year = datetime.date.today().year
+
+    past_month = month - 1 if month > 1 else 12
+    next_month = month + 1 if month < 12 else 1
+    past_year = year - 1 if past_month == 12 else year
+    next_year = year + 1 if next_month == 1 else year
+
+    regular_expenses_past_month = models.Entry.select().where(
+        (models.Entry.entry_date < datetime.datetime(year, month, 1)) &
+        (models.Entry.entry_date >= datetime.datetime(past_year, past_month, 1)) &
+        (models.Entry.tags.in_(['aluguel', 'cpfl', 'net', 'sanasa']))
+    )
+    regular_expenses_estimate = abs(
+        sum([models.entry.value for entry in regular_expenses_past_month]))
+
+    actual_incomes = models.Entry.select().where(
+        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
+        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
+        (models.Entry.value > 0) &
+        (~models.Entry.tags.in_(['transferencia', ]))
+    )
+    total_incomes = abs(
+        sum([models.entry.value for entry in actual_incomes]))
+
+    actual_expenses = models.Entry.select().where(
+        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
+        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
+        (models.Entry.value < 0) &
+        (~models.Entry.tags.in_(['aluguel', 'cpfl', 'net', 'sanasa'])) &
+        (~models.Entry.tags.in_(['transferencia', ]))
+    )
+    total_expenses = abs(
+        sum([entry.value for entry in actual_expenses]))
+
+    return jsonify({
+        "actual_incomes": total_incomes,
+        "actual_expenses": total_expenses,
+        "regular_expenses_estimate": regular_expenses_estimate,
+    }), 200
+
+
 @app.route('/paypal/notification', methods=['POST', ])
 def paypal_notification():
     ''' Listener for PayPal notification '''
