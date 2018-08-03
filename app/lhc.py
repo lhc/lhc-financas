@@ -61,13 +61,32 @@ def status():
     past_year = year - 1 if past_month == 12 else year
     next_year = year + 1 if next_month == 1 else year
 
+    regular_expenses_tags = ['aluguel', 'cpfl', 'net', 'sanasa', 'vivo']
+
+    regular_expenses_actual_month = models.Entry.select().where(
+        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
+        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
+        (models.Entry.tags.in_(regular_expenses_tags))
+    )
+    regular_expenses_actual = abs(
+        sum([entry.value for entry in regular_expenses_actual_month]))
+
     regular_expenses_past_month = models.Entry.select().where(
         (models.Entry.entry_date < datetime.datetime(year, month, 1)) &
         (models.Entry.entry_date >= datetime.datetime(past_year, past_month, 1)) &
-        (models.Entry.tags.in_(['aluguel', 'cpfl', 'net', 'sanasa']))
+        (models.Entry.tags.in_(regular_expenses_tags))
     )
-    regular_expenses_estimate = abs(
+    regular_expenses_past = abs(
         sum([entry.value for entry in regular_expenses_past_month]))
+
+    tags_already_spent = []
+    regular_expenses_estimate = 0
+    for entry in regular_expenses_actual_month:
+        regular_expenses_estimate += abs(entry.value)
+        tags_already_spent.append(entry.tags)
+    for entry in regular_expenses_past_month:
+        if entry.tags not in tags_already_spent:
+            regular_expenses_estimate += abs(entry.value)
 
     actual_incomes = models.Entry.select().where(
         (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
@@ -82,7 +101,7 @@ def status():
         (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
         (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
         (models.Entry.value < 0) &
-        (~models.Entry.tags.in_(['aluguel', 'cpfl', 'net', 'sanasa'])) &
+        (~models.Entry.tags.in_(regular_expenses_tags)) &
         (~models.Entry.tags.in_(['transferencia', ]))
     )
     total_expenses = abs(
@@ -92,6 +111,8 @@ def status():
         "actual_incomes": str(total_incomes),
         "actual_expenses": str(total_expenses),
         "regular_expenses_estimate": str(regular_expenses_estimate),
+        "regular_expenses_actual": str(regular_expenses_actual),
+        "regular_expenses_past": str(regular_expenses_past),
     }), 200
 
 
@@ -164,3 +185,7 @@ def paypal_notification():
         tax_entry.save()
 
     return ''
+
+
+if __name__ == "__main__":
+    app.run()
