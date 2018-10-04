@@ -64,16 +64,15 @@ def status():
     regular_expenses_tags = ['aluguel', 'cpfl', 'net', 'sanasa', 'vivo']
 
     regular_expenses_actual_month = models.Entry.select().where(
-        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
-        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
+        (models.Entry.entry_date >= datetime.date(year, month, 1)) &
+        (models.Entry.entry_date < datetime.date(next_year, next_month, 1)) &
         (models.Entry.tags.in_(regular_expenses_tags))
     )
     regular_expenses_actual = abs(
         sum([entry.value for entry in regular_expenses_actual_month]))
-
     regular_expenses_past_month = models.Entry.select().where(
-        (models.Entry.entry_date < datetime.datetime(year, month, 1)) &
-        (models.Entry.entry_date >= datetime.datetime(past_year, past_month, 1)) &
+        (models.Entry.entry_date < datetime.date(year, month, 1)) &
+        (models.Entry.entry_date >= datetime.date(past_year, past_month, 1)) &
         (models.Entry.tags.in_(regular_expenses_tags))
     )
     regular_expenses_past = abs(
@@ -89,8 +88,8 @@ def status():
             regular_expenses_estimate += abs(entry.value)
 
     actual_incomes = models.Entry.select().where(
-        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
-        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
+        (models.Entry.entry_date < datetime.date(next_year, next_month, 1)) &
+        (models.Entry.entry_date >= datetime.date(year, month, 1)) &
         (models.Entry.value > 0) &
         (~models.Entry.tags.in_(['transferencia', ]))
     )
@@ -98,8 +97,8 @@ def status():
         sum([entry.value for entry in actual_incomes]))
 
     actual_expenses = models.Entry.select().where(
-        (models.Entry.entry_date < datetime.datetime(next_year, next_month, 1)) &
-        (models.Entry.entry_date >= datetime.datetime(year, month, 1)) &
+        (models.Entry.entry_date < datetime.date(next_year, next_month, 1)) &
+        (models.Entry.entry_date >= datetime.date(year, month, 1)) &
         (models.Entry.value < 0) &
         (~models.Entry.tags.in_(regular_expenses_tags)) &
         (~models.Entry.tags.in_(['transferencia', ]))
