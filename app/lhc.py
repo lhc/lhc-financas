@@ -91,7 +91,7 @@ def status():
         (models.Entry.entry_date < datetime.date(next_year, next_month, 1)) &
         (models.Entry.entry_date >= datetime.date(year, month, 1)) &
         (models.Entry.value > 0) &
-        (~models.Entry.tags.in_(['transferencia', ]))
+        (~models.Entry.tags.in_(['transferencia', 'inicial', ]))
     )
     total_incomes = abs(
         sum([entry.value for entry in actual_incomes]))
@@ -101,7 +101,7 @@ def status():
         (models.Entry.entry_date >= datetime.date(year, month, 1)) &
         (models.Entry.value < 0) &
         (~models.Entry.tags.in_(regular_expenses_tags)) &
-        (~models.Entry.tags.in_(['transferencia', ]))
+        (~models.Entry.tags.in_(['transferencia', 'inicial', ]))
     )
     total_expenses = abs(
         sum([entry.value for entry in actual_expenses]))
