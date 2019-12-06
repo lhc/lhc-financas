@@ -153,7 +153,11 @@ def paypal_notification():
             entry_date = datetime.datetime.strptime(raw_payment_date, "%b %d, %Y")
             entry_date = entry_date.strftime("%Y-%m-%d")
 
-        account = "_paypal"
+        if "cnpj" in notification.get("item_number", ""):
+            account = "_paypal_lhc"
+        else:
+            account = "_paypal"
+
         description = "{} - {}".format(notification.get("item_name"), full_name)
         tax_description = "Taxa - {}".format(description)
 
@@ -164,8 +168,12 @@ def paypal_notification():
             "lhc-60": "mensalidade",
             "lhc-30": "contribuicao",
             "doacao-lhc": "doacao",
+            "aporteinicial": "aporteinicial",
+            "lhc-cnpj-85": "mensalidade",
+            "lhc-cnpj-110": "mensalidade",
+            "lhc-cnpj-70": "mensalidade",
+            "lhc-cnpj-30": "contribuicao",
         }
-
         tags = tags_map.get(notification.get("item_number", ""), "")
 
         entry = models.Entry(
