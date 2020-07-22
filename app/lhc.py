@@ -166,6 +166,7 @@ def paypal_notification():
             "lhc-85": "mensalidade",
             "lhc-110": "mensalidade",
             "lhc-60": "mensalidade",
+            "lhc-70": "mensalidade",
             "lhc-30": "contribuicao",
             "doacao-lhc": "doacao",
             "aporteinicial": "aporteinicial",
@@ -173,6 +174,8 @@ def paypal_notification():
             "lhc-cnpj-110": "mensalidade",
             "lhc-cnpj-70": "mensalidade",
             "lhc-cnpj-30": "contribuicao",
+            "contribuicao-lhc-30": "contribuicao",
+            "starving-hacker": "mensalidade",
         }
         tags = tags_map.get(notification.get("item_number", ""), "")
 
